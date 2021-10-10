@@ -5,11 +5,11 @@ from django.urls import reverse
 @pytest.mark.django_db
 def test_course_retrieve(api_client, course_factory):
     course = course_factory(_quantity=1)[0]
-    url = reverse('courses-list')
+    url = reverse('courses-detail', args=[course.id])
     response = api_client.get(url)
     response_json = response.json()
     assert response.status_code == 200
-    assert course.id == response_json[0]['id']
+    assert course.id == response_json['id']
 
 
 @pytest.mark.django_db
@@ -59,3 +59,17 @@ def test_course_delete(api_client, course_factory):
     url = reverse('courses-detail', args=[course.id])
     response = api_client.delete(url)
     assert response.status_code == 204
+
+
+
+@pytest.mark.django_db
+def test_course_update(api_client, course_factory):
+    course = course_factory(_quantity=1)[0]
+    url = reverse('courses-detail', args=[course.id])
+    payload = {
+        'name': 'Python-разработчик'
+    }
+    response = api_client.patch(url, payload)
+    response_json = response.json()
+    assert response.status_code == 200
+    assert response_json['name'] == payload['name']
